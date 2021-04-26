@@ -8,7 +8,7 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 ## Material and methods:
 ## Funding Source:
 <p align="left">
-  <img width="150" height="100" src="Images/ConsortiumBanner2.png">
+  <img width="100" height="60" src="Images/ConsortiumBanner2.png">
   </p>
 
   
