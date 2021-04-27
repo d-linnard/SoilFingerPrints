@@ -2,36 +2,16 @@
 
 You can use the [editor on GitHub](https://github.com/d-linnard/NonAgriculturalSoils/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+# Comparison of potato yields, soil health, and pathogen loads in virgin and non-virgin soils. 
+## Motivation
+Since potatoes were first grown, growers have noticed that the history of a field influences both yield and quality. Fields previously planted with potatoes generally yield less than field soils not previously farmed (virgin soils) or fields never planted with potatoes. Indeed, recent conversations with growers indicated that 14-26% greater yields can be achieved from virgin soils compared to nearby non-virgin soils. The purpose of this project is to determine what is responsible for these observations.  
+## Objectives 
+* Characterize soil physical, chemical, and biological properties of virgin and non-virgin fields in Columbia and Skagit Valley.
+* Quantify potato performance and disease expression in microplots.
+* Dissect the relationships between soil properties, potato yields, and disease expression 
+## Material and methods
+## Funding Source
+<p align="left">
+  <img width="150" height="100" src="Images/ConsortiumBanner2.png">
+  </p>
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/d-linnard/NonAgriculturalSoils/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
