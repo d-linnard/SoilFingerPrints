@@ -6,6 +6,9 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 * Quantify potato performance and disease expression in microplots.
 * Dissect the relationships between soil properties, potato yields, and disease expression 
 ## Material and methods
+<p align="left">
+  <img width="400" height="300" src="Flowchart.png">
+  </p>
 * Soil samples will be collected from virgin and non-virgin soils (n=20) in Columbia Basin and Skagit Valley of Washington and Oregon.
 * Following soil properties will be characterized from each soil sample:
   * Soil physical, chemical and biological properties of soil
