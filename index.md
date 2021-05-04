@@ -6,8 +6,6 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 * Quantify potato performance and disease expression in microplots.
 * Dissect the relationships between soil properties, potato yields, and disease expression 
 ## Material and methods
-#### Flow chart showing workflow
-
 <p align="left">
   <img width="600" height="300" src="Flowchart.png">
   </p>
