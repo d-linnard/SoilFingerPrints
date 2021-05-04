@@ -7,7 +7,7 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 3. Dissect the relationships between soil properties, potato yields, and disease expression 
 ## Material and methods
 <p align="left">
-  <img width="600" height="300" src="Flowchart.png">
+  <img width="700" height="350" src="Flowchart.png">
   </p>
 Soil samples will be collected from virgin and non-virgin soils (n=20) in Columbia Basin and Skagit Valley of Washington and Oregon.
 
