@@ -10,8 +10,6 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 <p align="left">
   <img width="700" height="350" src="Flowchart.png">
   </p>
-Soil samples will be collected from virgin and non-virgin soils (n=20) in Columbia Basin and Skagit Valley of Washington and Oregon.
-
 Objective 1:
 
 Objective 2:
@@ -25,6 +23,8 @@ Objective 4:
   <img width="200" height="125" src="ConsortiumBanner2.png">
   </p>
 
+
+Soil samples will be collected from virgin and non-virgin soils (n=20) in Columbia Basin and Skagit Valley of Washington and Oregon.
 * Following soil properties will be characterized from each soil sample:
   * Soil physical, chemical and biological properties of soil
   * Free living and plant-parasitic nematodes with DNA sequencing
