@@ -19,4 +19,5 @@ We should update this with:
   - objectives
   - material and methods
     -  experimental design & set up
+    -  [Field locations](https://docs.google.com/spreadsheets/d/1ueUsxG38xVWpykEKBluq_0PrLB60ttyE/edit#gid=510634563)
   - budget and funding source
