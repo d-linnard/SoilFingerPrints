@@ -6,17 +6,10 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 2. Characterize soil physical, chemical, and biological properties of virgin and non-virgin fields in Columbia and Skagit Valley.
 3. Quantify potato performance and disease expression in microplots.
 4. Dissect the relationships between soil properties, potato yields, and disease expression 
-## Material and methods
+## Study Design
 <p align="left">
   <img width="700" height="350" src="Flowchart.png">
   </p>
-Objective 1:
-
-Objective 2:
-
-Objective 3: 
-
-Objective 4: 
 
 ## Funding Source
 <p align="left">
@@ -24,11 +17,3 @@ Objective 4:
   </p>
 
 
-Soil samples will be collected from virgin and non-virgin soils (n=20) in Columbia Basin and Skagit Valley of Washington and Oregon.
-* Following soil properties will be characterized from each soil sample:
-  * Soil physical, chemical and biological properties of soil
-  * Free living and plant-parasitic nematodes with DNA sequencing
-  * Presence and abundance of soilborne potato pathogen on semi-selective media
-  * Bacterial and fungal community structure with 16S rRNA and ITS amplicon sequencing
-* Potato yield and disease expression will be quantified in common garden microplots in Pullman, WA in 2021 and 2022.
-* 
