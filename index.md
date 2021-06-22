@@ -10,10 +10,13 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 <p align="left">
   <img width="700" height="350" src="Flowchart.png">
   </p>
+## Reserach Activities
+
+## Results
 
 ## Funding Source
 <p align="left">
-  <img width="200" height="125" src="ConsortiumBanner2.png">
+  <img width="150" height="100" src="ConsortiumBanner2.png">
   </p>
 
 
