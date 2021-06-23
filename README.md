@@ -2,9 +2,10 @@
 ## Motivation
 Since potatoes were first grown, growers have noticed that the history of a field influences both yield and quality. Fields previously planted with potatoes generally yield less than field soils not previously farmed (virgin soils) or fields never planted with potatoes. Indeed, recent conversations with growers indicated that 14-26% greater yields can be achieved from virgin soils compared to nearby non-virgin soils. The purpose of this project is to determine what is responsible for these observations.  
 ## Objectives 
-* Characterize soil physical, chemical, and biological properties of virgin and non-virgin fields in Columbia and Skagit Valley.
-* Quantify potato performance and disease expression in microplots.
-* Dissect the relationships between soil properties, potato yields, and disease expression 
+1.	Sample soils from virgin and non-virgin fields.
+2.	Characterize soil physical, chemical, and biological properties.
+3.	Quantify potato performance in microplots.
+4.	Learn from data.
 ## Material and methods
 ## Funding Source
 <p align="left">
