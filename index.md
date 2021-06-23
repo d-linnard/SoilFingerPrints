@@ -4,7 +4,7 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 1. Sample soils from virgin and non-virgin fields.
 2. Characterize soil physical, chemical, and biological properties of virgin and non-virgin fields in Columbia and Skagit Valley.
 3. Quantify potato performance and disease expression in microplots.
-4. Dissect the relationships between soil properties, potato yields, and disease expression 
+4. Learn from data.
 ## Study Design
 <p align="left">
   <img width="700" height="350" src="Flowchart.png">
@@ -13,6 +13,16 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 ## Reserach Activities
 
 ## Results
+
+### PIs
+- [David Linnard Wheeler](https://plantpath.wsu.edu/david-wheeler/)
+- [Deirdre Griffin LaHue](https://css.wsu.edu/people/faculty/deirdre-griffin-lahue/)
+- [Cynthia Gleason](https://plantpath.wsu.edu/people/faculty/gleason/)
+- [Ken Frost](https://css.wsu.edu/people/faculty/deirdre-griffin-lahue/)
+
+### Post-docs and Graduate Students
+- Teal Potter
+- Sudha GC Upadhaya
 
 ### Funding Source
 <p align="left">
