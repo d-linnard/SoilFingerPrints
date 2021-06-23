@@ -20,7 +20,7 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 - [David Linnard Wheeler](https://plantpath.wsu.edu/david-wheeler/)
 - [Deirdre Griffin LaHue](https://css.wsu.edu/people/faculty/deirdre-griffin-lahue/)
 - [Cynthia Gleason](https://plantpath.wsu.edu/people/faculty/gleason/)
-- [Ken Frost](https://css.wsu.edu/people/faculty/deirdre-griffin-lahue/)
+- [Ken Frost](https://bpp.oregonstate.edu/users/kenneth-frost)
 
 ### Post-docs and Graduate Students
 - Teal Potter
