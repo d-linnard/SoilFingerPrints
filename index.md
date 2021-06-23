@@ -14,7 +14,7 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 
 ## Results
 
-## Funding Source
+### Funding Source
 <p align="left">
   <img width="150" height="100" src="ConsortiumBanner2.png">
   </p>
