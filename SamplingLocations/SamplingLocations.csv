@@ -1,0 +1,23 @@
+ID,Label,Location,Pair,FieldID,lat,long,FieldType,FieldHistory,Source,Contact,SamplingYear,Notes,SoilOrder,SoilGreatgroup,SoilSubgroup,SoilFamily,SoilSeries,latitude,longitude
+1,1-0-1-2,Columbia Basin,1,1201,46.283706,-118.674581,Non-virgin field,15+ potato crops,Blaine Meek,bmeek@agrinw.com,2021,,Mollisols,Haploxerolls,Calcidic Haploxerolls,...mesic Calcidic Haploxerolls,Ritzville,"46°17'1.34""N","118°40'28.49""W"
+2,0-0-1-2,Columbia Basin,1,1209,46.281286,-118.684761,Virgin field,,Blaine Meek,bmeek@agrinw.com,2021,,Mollisols,Haploxerolls,Calcidic Haploxerolls,...mesic Calcidic Haploxerolls,Ritzville,"46°16'52.63""N","118°41'5.14""W"
+4,1-0-2-1,Columbia Basin,2,106,47.084598,-119.808285,Non-virgin field,Grown pototo over years and will be planted potato in 2022,Allen Horning,allen@horningfarms.net,2021,,Entisols,Torripsamments,Xeric Torripsamments,...Xeric Torripsamments,Quincy,"47° 5'4.55""N","119°48'29.83""W"
+5,0-0-2-1,Columbia Basin,2,HB2,47.076717,-119.802953,Virgin field,Double cropped peas/sweetcorn in 2020 followed by potato in 2021. Field was sagebrush prior to that,Allen Horning,allen@horningfarms.net,2021,,Entisols,Torripsamments,Xeric Torripsamments,...Xeric Torripsamments,Quincy,"47° 4'35.76""N","119°48'10.80""W"
+6,0-0-3-5,Columbia Basin,3,V,47.045431,-119.609527,Virgin field,out of sage brush within past couple years,Wes Boorman,509-398-1613,2021,will be planted by 4/16,Entisols,Torripsamments,Xeric Torripsamments,...Xeric Torripsamments,Quincy,"47° 2'43.55""N","119°36'34.30""W"
+7,1-0-3-5,Columbia Basin,3,NV,47.039913,-119.604025,Non-virgin field,WE,Wes Boorman,509-398-1614,2021,will be planted by 4/16,Entisols,Torripsamments,Xeric Torripsamments,...Xeric Torripsamments,Quincy,"47° 2'23.69""N","119°36'14.49""W"
+8,0-1-4-2,Skagit Valley,4,Skagit virgin 1,48.4382,-122.4225,Virgin field,Hasn't had potatoes in 30 years,Brock Ingman,,2021,Planted a few days prior to sampling,Entisols,Fluvents,Aquic Xerofluvents,...mesic Aquic Xerofluvents,Field,,
+9,1-1-4-2,Skagit Valley,4,Skagit potatoes 1,48.4326,-122.3791,Non-virgin field,Every 3 years for XX years,Brock Ingman,,2021,Planted a few days prior to sampling,Entisols,Fluvents,Aquic Xerofluvents,...mesic Aquic Xerofluvents,Field,,
+10,0-0-5-4,Columbia Basin,5,983,45.69724886,-119.3547182,Virgin field,2017/2018:NoCrop - 2019: S W W Wheat - 2020: Grain Corn,Michael Madsen,mmadsen@agrinw.com,2021,,,,,,,,
+11,0-0-6-5,Columbia Basin,6,989,45.67176481,-119.346965,Virgin field,2017/2018:NoCrop - 2019: S W W Wheat - 2020: Grain Corn,Michael Madsen,mmadsen@agrinw.com,2021,,,,,,,,
+12,0-0-7-6,Columbia Basin,7,990,45.6655718,-119.3518295,Virgin field,2017/2018:NoCrop - 2019: S W W Wheat - 2020: Grain Corn,Michael Madsen,mmadsen@agrinw.com,2021,,,,,,,,
+13,0-0-8-3,Columbia Basin,8,991,45.65722227,-119.346829,Virgin field,2017/2018/2019:NoCrop - 2020: Grain Corn,Michael Madsen,mmadsen@agrinw.com,2021,,,,,,,,
+14,1-0-5-4,Columbia Basin,5,14 (988),45.679267,-119.346864,Non-virgin field,,Michael Madsen,mmadsen@agrinw.com,2021,,,,,,,,
+15,1-0-6-5,Columbia Basin,6,530,45.749823,-119.1507605,Non-virgin field,,Matt Pursel,,2021,,,,,,,,
+16,1-0-7-6,Columbia Basin,7,541,45.7378632,-119.1228807,Non-virgin field,,Matt Pursel,,2021,,,,,,,,
+17,1-0-8-3,Columbia Basin,8,641,45.7392845,-119.1337755,Non-virgin field,,Matt Pursel,,2021,,,,,,,,
+18,0-1-9-3,Skagit Valley,9,Morrison - virgin,48.20852,-122.33752,Virgin field,"Hasn't had potatoes before, currently planted in potatoes",Darrin Morrison,,2021,planted in potatoes,,,,,,,
+19,1-1-9-3,Skagit Valley,9,Morrison - nonvirgin,48.33374,-122.3423,Non-virgin field,"History of potatoes, currently planted in potatoes",Darrin Morrison,,2021,Potatoes planted but not emerged,,,,,,,
+20,0-1-10-1,Skagit Valley,10,WSU NWREC LTARE Potato Plots,48.439919,-122.393783,Virgin field,"No history of potatoes, diverse long term history across field, 2019: Ryegrass 2020: Ryegrass?",WSU NWREC,,2021,Potatoes planted but not emerged,,,,,,,
+21,1-1-10-1,Skagit Valley,10,Ingman - nonvirgin,48.40048,-122.409583,Non-virgin field,,Brock Ingman,,2021,Potatoes planted but not emerged,,,,,,,
+22,0-1-11-4,Skagit Valley,11,Hedlin - virgin,48.387201,-122.489909,Virgin field,"No history of potatoes, currently planted in grain (barley?)",Dave Hedlin,,2021,Barley planted but not emerged,,,,,,,
+23,1-1-11-4,Skagit Valley,11,Hedlin - nonvirgin,48.382227,-122.494621,Non-virgin field,"4+ potato crops, currently planted in grain (barley?)",Dave Hedlin,,2021,Barley planted but not emerged,,,,,,,
