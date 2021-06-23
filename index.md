@@ -12,7 +12,7 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
   <img width="700" height="350" src="Flowchart.png">
   </p>
   
-## Reserach Activities
+## Research Activities
 
 ## Results
 
