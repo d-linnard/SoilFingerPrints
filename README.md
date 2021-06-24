@@ -6,19 +6,13 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 2.	Characterize soil physical, chemical, and biological properties.
 3.	Quantify potato performance in microplots.
 4.	Learn from data.
-## Material and methods
+
 ## Funding Source
 <p align="left">
   <img width="150" height="100" src="Images/ConsortiumBanner2.png">
   </p>
 
-  
-
-
-We should update this with:
-  - motivation
-  - objectives
   - material and methods
     -  experimental design & set up
     -  [Field locations](https://docs.google.com/spreadsheets/d/1ueUsxG38xVWpykEKBluq_0PrLB60ttyE/edit#gid=510634563)
-  - budget and funding source
+ 
