@@ -9,7 +9,7 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 
 ## Study Design
 <p align="left">
-  <img width="700" height="350" src="Flowchart.png">
+  <img width="700" height="350" src="Images/Flowchart.png">
   </p>
   
 ## Research Activities
@@ -28,7 +28,7 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
 
 ### Funding Source
 <p align="left">
-  <img width="150" height="100" src="ConsortiumBanner2.png">
+  <img width="150" height="100" src="Images/ConsortiumBanner2.png">
   </p>
 
 
