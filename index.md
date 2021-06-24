@@ -13,10 +13,11 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
   </p>
   
 ## Research Activities
-<img src="Images/Map.jpg" width="200" height = '170'/>
+##### Soil sampling locations
+<img src="Images/Map1.jpg" width="350" height = '280'/>
 
 ##### Microplot
-<img src="Images/planting.jpg" width="200" height = '170'/> <img src="Images/plot1.jpg" width="200" height ='170'/> <img src="Images/plant1.jpg" width="200" height = '170'/>
+<img src="Images/planting.jpg" width="180" height = '150'/> <img src="Images/plot1.jpg" width="180" height ='150'/> <img src="Images/plant1.jpg" width="180" height = '150'/>
 
 ## Results
 
