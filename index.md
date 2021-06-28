@@ -14,7 +14,7 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
   
 ## Research Activities
 ##### Soil sampling locations
-<img src="Images/Map.jpg" width="400" height = '300'/>
+<img src="Images/Map_jitter.jpg" width="400" height = '300'/>
 
 ##### Microplot
 <img src="Images/plot1.jpg" width="180" height ='150'/> <img src="Images/plant1.jpg" width="180" height = '150'/>
