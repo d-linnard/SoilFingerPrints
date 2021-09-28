@@ -34,5 +34,5 @@ Since potatoes were first grown, growers have noticed that the history of a fiel
   <img width="150" height="100" src="Images/ConsortiumBanner2.png">
   </p>
 
-    -  [Field locations](https://docs.google.com/spreadsheets/d/1ueUsxG38xVWpykEKBluq_0PrLB60ttyE/edit#gid=510634563)
+* [Field locations](https://docs.google.com/spreadsheets/d/1ueUsxG38xVWpykEKBluq_0PrLB60ttyE/edit#gid=510634563)
  
