@@ -1,0 +1,147 @@
+## Usearch and Vsearch pipeline for the amplicon sequencing.
+
+# Install ubuntu (for wsl), conda, usearch, vsearch, qiime2, dada2 (if needed)
+
+# Simple commond line codes:
+ls or ll # list out the files in the directory
+cd #set directory
+../.. #jump directory
+gzip -d filename.gz #unsip files
+gzip -d *.gz #unzip all files in the directory
+unzip ena_files.zip -d ena_files #zip files
+mkdir foldername #make folder in the directory
+mv primers.txt primers.fa # change txt to fasta files
+
+
+#Wrangling
+rename 's/^/_PRE_/' * # add prefix to all samples
+
+
+#remove prefix (_PRE_) from all samples
+remove=_PRE_
+for i in  "$remove"*;do mv "$i" "${i#"$remove"}";done
+ls
+
+# add R in each samples
+for i in SRR*; do
+  mv "$i" "${i/_/_R}"
+done
+
+#copy files in multiple folders to one folder
+cp -r ena_files/*/*.fastq.gz ./All_samples
+
+#Documentation
+
+#set up directory:
+cd ../..
+cd mnt/e/Metagenomics/Demo/fq
+gzip -d *.gz #unzip all files in the directory
+
+
+#Wrangling
+#Add R in each samples
+for i in SRR*; do
+  mv "$i" "${i/_/_R}"
+done
+
+#check the sequence information
+usearch -fastx_info SRR14333595_R2.fastq#for one sample
+
+##for multiple samples
+for i in *.fastq ; do usearch -fastx_info $i; done
+
+for i in *.fastq ; do usearch -fastx_info $i -output $i.txt; done #save files
+
+
+# remove 30 base pairs from the r2 sequence
+
+for i in *_R2.fastq; do echo $i; done #print R2 sequences
+
+for i in *_R2.fastq; do usearch -fastx_truncate $i -stripright 30 -fastqout ../out/$i; done #save to output folder
+
+for i in *_R2.fastq; do usearch -fastx_truncate $i -relabel @ -stripright 30 -fastqout ../fq/truncated/$i; done #in truncated folder
+
+
+# Merge 
+usearch -fastq_mergepairs SRR14333596_R1.fastq #for single sample with default parameters
+
+usearch -fastq_mergepairs SRR14333596_R1.fastq -fastq_maxdiffs 15 -fastq_pctid 80 #with adjusted parameters
+Merge all files:
+
+usearch -fastq_mergepairs *_R1.fastq -relabel @ -fastq_maxdiffs 15 -fastq_pctid 80 -fastqout ../out/merged.fq
+
+check:
+cd ../out
+ll
+less -S merged.fq # donot check this
+
+# Trim Primers
+
+##Method 1 (preferred)
+
+#check average base pair
+
+usearch -search_oligodb merged.fq -db primers.fa -strand both userout primer_hits.txt -userfields query+qlo+qhi+qstrand
+head(primer_hits.txt)
+tail(primer_hits.txt)
+
+#It is just an option in usearch. I didnot use this. I will use vsearch for the quality filtering (eg. primer trimming, error rate,sequence size and all)
+usearch -fastx_truncate merged.fq -stripleft 22 -stripright 22 -fastqout trimmed.fq
+
+#fastqc report
+fastqc trimmed.fq
+
+##Method 2
+
+Primers: 
+>P1
+AGAGTTTGATCMTGGCTCAG (use g or b) 
+>P2
+ATTACCGCGGCTGCTGG complement sequence: ATTACCGCGGCTGCTGG (use a or b)
+>P3
+CTTGGTCATTTAGAGGAAG*TAA
+>P4
+GCTGCGTTCTTCATCGA*TGC
+
+cutadapt -g AGAGTTTGATCMTGGCTCAG -a ATTACCGCGGCTGCTGG -g CTTGGTCATTTAGAGGAAG -g GCTGCGTTCTTCATCGA -o output_trimmed.fastq merged.fq
+
+
+
+# quality filtering (remove primer, define max and min sequence lengths)
+
+vsearch -fastq_filter merged.fq -fastq_stripleft 22 -fastq_stripright 20 -fastq_maxee 1 -fastq_minlen 150 -fastq_qmax 42 -fastaout filtered.fasta
+fastqc filtered.fq
+
+
+# Dereplication or find unique sequence
+
+## Using vsearch (I will go with vsearch)
+
+vsearch --derep_fulllength filtered.fq -sizeout -relabel Uniq -output unique_seqs.fa
+
+## Using usearch
+
+usearch -fastx_uniques filtered.fq -fastaout ../out/uniques.fa -relabel Uniq -sizeout
+
+
+# Denoise (unnoise3 algorith)
+
+#usearch -sortbysize unique_seqs.fa -fastaout seqs_sorted.fa#sort sequence (unique.seqs.fa was already sorted)
+
+usearch -unoise3 unique_seqs.fa -zotus denoised.fa -minsize 5 -tabbedout unoise3.txt #minsize can change. I am using 0.005% of the sequence
+
+
+#OTU table
+An OTU table was constructed by mapping all sequences to OTU representatives at a 97% similarity threshold
+
+vsearch -usearch_global filtered.fasta --db denoised.fa --id 0.97 --otutabout otu_counts.txt
+
+
+#Predict taxonomy of sequence
+
+usearch -sintax denoised.fa -db rdp_16s_v18.fa -tabbedout reads_sintax.txt -strand both -sintax_cutoff 0.8 #rdp database for bacteria
+
+usearch -sintax denoised.fa -db UNITE_02.02.2019.fasta -tabbedout reads_sintax.txt -strand both -sintax_cutoff 0.8 #ITS database
+
+
+

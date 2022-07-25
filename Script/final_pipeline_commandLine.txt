@@ -1,0 +1,73 @@
+#Documentation
+
+#set up directory:
+cd ../..
+cd mnt/e/Metagenomics/Demo/fq
+gzip -d *.gz #unzip all files in the directory
+
+
+#Wrangling
+#Add R in each samples
+for i in SRR*; do
+  mv "$i" "${i/_/_R}"
+done
+
+#check the sequence information
+
+##for multiple samples
+for i in *.fastq ; do usearch -fastx_info $i; done
+
+
+# Merge 
+Merge all files:
+
+usearch -fastq_mergepairs *_R1.fastq -relabel @ -fastq_maxdiffs 15 -fastq_pctid 80 -fastqout ../out/merged.fq
+
+check:
+cd ../out
+ll
+head merged.fq
+fastqc merged.fq
+
+# Trim Primers
+
+##check average base pair
+
+usearch -search_oligodb merged.fq -db primers.fa -strand both userout primer_hits.txt -userfields query+qlo+qhi+qstrand
+head(primer_hits.txt)
+tail(primer_hits.txt)
+
+
+# quality filtering (remove primer, define max and min sequence lengths)
+
+vsearch -fastq_filter merged.fq -fastq_stripleft 22 -fastq_stripright 20 -fastq_maxee 1 -fastq_minlen 150 -fastq_qmax 42 -fastaout filtered.fasta
+fastqc filtered.fq
+
+
+# Dereplication or find unique sequences
+
+vsearch --derep_fulllength filtered.fq -sizeout -relabel Uniq -output unique_seqs.fa
+
+
+
+# Denoise (unnoise3 algorithm)
+
+usearch -unoise3 unique_seqs.fa -zotus denoised.fa -minsize 5 -tabbedout unoise3.txt #minsize can change. I am using 0.005% of the sequence
+
+
+#OTU table
+An OTU table was constructed by mapping all sequences to OTU representatives at a 97% similarity threshold
+
+vsearch -usearch_global filtered.fasta --db denoised.fa --id 0.97 --otutabout otu_counts.txt
+
+
+#Predict taxonomy of sequence
+
+usearch -sintax denoised.fa -db rdp_16s_v18.fa -tabbedout reads_sintax.txt -strand both -sintax_cutoff 0.8 #rdp database for bacteria
+
+usearch -sintax denoised.fa -db rdp_its_v2.fa -tabbedout reads_sintax.txt -strand both -sintax_cutoff 0.8 #ITS database
+
+
+
+
+
