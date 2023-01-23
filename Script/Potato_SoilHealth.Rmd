@@ -1,0 +1,940 @@
+---
+title: "Potato Soil Health"
+author: "Sudha GC Upadhaya"
+date: "2023-01-21"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+
+```{r, echo=T, warning = F, cache=FALSE, }
+library(ggplot2)
+library(raster)
+library(agricolae)
+library(tidyr)
+library(ggpubr)
+library(dplyr)
+library(tidyverse)
+library(data.table)
+library(vegan)
+library(lme4)
+library(lmerTest)
+```
+
+# Plot sampling locations on Map
+
+```{r, warning = F}
+df = read_csv(file = 'C:/Users/theox/Desktop/Projects/SoilFingerPrints/Data/SamplingLocations/SamplingLocations.csv')
+df = df[c('ID', 'lat', 'long', 'FieldType')]
+head(df)
+df$FieldType = gsub('Field', "", df$FieldType)
+df$FieldType = gsub('field', "", df$FieldType)
+df$FieldType = gsub('Non-virgin ', "Non-virgin", df$FieldType)
+df$FieldType = gsub('Virgin ', "Virgin", df$FieldType)
+unique(df$FieldType)
+```
+
+
+```{r, warning = F}
+state_list    <- c('California', 'Nevada', 'Utah', 'Wyoming', 
+                   'Montana', 'Idaho', 'Oregon', 'Washington')
+province_list <- c("British Columbia", "Alberta")
+us <- raster::getData("GADM",country="USA",level=1)
+canada <- raster::getData("GADM",country="CAN",level=1)
+us.states <- us[us$NAME_1 %in% state_list,]
+ca.provinces <- canada[canada$NAME_1 %in% province_list,]
+```
+
+
+```{r, warning = F}
+options(repr.plot.width=10, repr.plot.height=8)
+#jpeg('Map_soilprints.jpg',width=10,height=8,units='in',res=300)
+Map = ggplot(us.states,aes(x=long,y=lat, group = group))+
+  geom_path(size = 0.25)+
+  geom_path(data=ca.provinces, size = 0.25, color = 'grey60')+
+  geom_path(data=subset(us.states, NAME_1 %in% c('Montana', 'California','Nevada','Utah','Wyoming')),
+            size=0.25,color="grey60")+
+  geom_polygon(data=subset(us.states, NAME_1 %in% c('Idaho', 'Oregon', 'Washington')),
+               aes(x=long, y=lat, group=group), fill="white", colour = "black", size=0.50)+
+  theme(panel.background = element_rect(fill = "white", colour = "grey50"))+
+  coord_map("bonne", lat0 = 50,
+            xlim = c(-124.5, -116.5),ylim = c(44, 49))+
+  xlab("Longitude") +
+  ylab("Latitude")+
+  geom_point(data = df, aes(x= long, y = lat,color = FieldType, fill = FieldType), position=position_jitter(h=0.07, w=0.07),shape =21, size =6, group = FALSE, alpha =0.5)+
+  scale_fill_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin', 'Native'), values = c('orange', 'chartreuse4', 'tomato'))+
+  scale_colour_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin', 'Native'),values = c('black', 'black', 'black')) +
+  guides(color = guide_legend('Field Type'))+
+  theme_classic()+
+  theme(axis.title.x= element_text(size =18, color ='black'),
+        axis.title.y = element_text(size =18, color ='black'),
+        axis.text.x = element_text(size =15,color = 'black'),
+        axis.text.y = element_text(size =15, color = 'black'),
+        legend.text = element_text(size =15),
+        legend.title = element_text(size =17),
+  )
+Map
+
+#dev.off()
+```
+
+# 2021 data visulatization and inference
+
+```{r}
+df_21 = read.csv('C:/Users/theox/Desktop/Projects/SoilFingerPrints/Data/2021/SoilFingerPrintsData_21.csv')
+df_21[c("ID", "Pair", "FieldType","Block")] <- lapply(df_21[c("ID", "Pair", "FieldType", "Block")],
+                                                factor)
+df_21 = df_21[, c(1, 3, 4:18, 20, 22, 23,24,26:32, 34)]
+#lapply(df, unique)
+head(df_21)
+```
+## Microplot study
+
+### Senescence
+
+#### AUSPC calcuation
+
+```{r}
+library('agricolae')
+ts = gsub("(?:[^.]+\\.){1}([^.]+).*", "\\1",
+    names(df_21)[(grepl("Sen", names(df_21)))])
+ts = as.numeric(ts)
+ts[2:5] = ts[2:5] +31
+ts[6:8] = ts[6:8]+60#= ts[2]+30
+ts = ts-28
+ts
+names(df_21)[(grepl("Sen", names(df_21)))] <- ts
+df_21$AUDPC <- audpc(df_21[,9:16],ts)
+head(df_21$AUDPC)
+names(df_21)
+```
+
+#### Plot Senescence
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('Sen_21.jpg',width=5,height=3,units='in',res=300)
+c1= ggplot(data = df_21, aes(x =FieldType, y = AUDPC, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y="Senescence (AUSPC)") +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin'), values = c('orange', 'chartreuse4'))+
+  facet_wrap(~ Location)
+#c1
+#dev.off()
+```
+
+
+### Tuber weight (more than 20 gm)
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('TuberwtAll_soilprints.jpg',width=5,height=3,units='in',res=300)
+a1= ggplot(data = df_21, aes(x =FieldType, y = Weight_GT20, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y="Tuber weight (gm)") +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin'), values = c('orange', 'chartreuse4'))+
+  facet_wrap(~ Location)
+#a1
+#dev.off()
+```
+
+### Tuber count (more than 20 gm)
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('TuberwtAll_soilprints.jpg',width=5,height=3,units='in',res=300)
+b1= ggplot(data = df_21, aes(x =FieldType, y = Count_GT20, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y="Number of tubers") +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin'), values = c('orange', 'chartreuse4'))+
+  facet_wrap(~ Location)
+#b1
+#dev.off()
+```
+
+
+```{r}
+options(repr.plot.width = 10, repr.plot.height = 5)
+#jpeg('microplot_21.jpg',width=10,height=5,units='in',res=300)
+microplot_21 = ggarrange(a1,b1,c1, labels = c("A", "B", "C"), ncol = 2, nrow = 2)
+microplot_21
+#dev.off()
+```
+
+
+
+#### Calculate yield Difference 
+
+```{r}
+df21_wt_diff = df_21 %>% dplyr::select(FieldType, Pair, Wt_Tuber.g., Location) %>% 
+  spread(FieldType, Wt_Tuber.g.)
+df21_wt_diff = rename(df21_wt_diff, non_virgin = `Non-virgin field`, virgin = `Virgin field`)
+df21_wt_diff = mutate(df21_wt_diff, diff = virgin - non_virgin)
+df21_wt_diff
+```
+
+#### plot yield difference
+
+```{r, echo = F, include = F}
+options(repr.plot.width = 2, repr.plot.height = 2)
+#jpeg('yield_21_difference.jpg',width=3,height=3,units='in',res=300)
+yield_difference = ggplot(data = df21_wt_diff, aes(x =Location, y = diff, color = Location))+
+    geom_boxplot(width = 0.4)+geom_hline(yintercept = 0)+ ylim(-1500, 1500)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1, height = 0.3))+
+    theme_bw()+
+    labs(x = 'Location', y=expression(paste("Difference (Tuber yield)"))) +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Location', labels = c('Columbia Basin', 'Skagit Valley'), 
+                  values = c('darkgoldenrod1', 'darkgreen'))
+yield_difference
+#dev.off()
+```
+
+#### Inferece on weight
+
+```{r}
+fit_yield21 = lmer(Wt_Tuber.g. ~ FieldType + (1|Location), 
+                  data = df_21)
+summary(fit_yield21)
+anova(fit_yield21)
+
+## for columbia basin
+df_21_CB = df_21[df_21$Location == 'Columbia Basin', ]
+anova(lmer(Wt_Tuber.g. ~ FieldType + (1|Pair), 
+                  data = df_21_CB))
+anova(lm(Wt_Tuber.g. ~ FieldType, data = df_21_CB))
+
+# conduct paired t test
+t.test(Wt_Tuber.g.~ FieldType, 
+       #paired=T, 
+       data=df_21_CB)
+
+#for skagit valley
+df_21_SV = df_21[df_21$Location == 'Skagit Valley', ]
+anova(lmer(Wt_Tuber.g. ~ FieldType + (1|Pair), 
+                  data = df_21_SV))
+anova(lm(Wt_Tuber.g. ~ FieldType, data = df_21_SV))
+
+# conduct paired t test
+t.test(Wt_Tuber.g.~ FieldType, 
+       paired=T, 
+       data=df_21_SV)
+
+
+# Test if there is difference between locations
+t.test(diff~ Location, 
+       data=df21_wt_diff)
+
+```
+
+#### Inference on all variables
+
+```{r}
+inf = function(x ,df = df_21){
+  fit = lmer(x ~ FieldType + (1|Location), 
+                  data = df)
+return(anova(fit))}
+
+variables = names(df_21)[-c(1,2,3,4,5,10,11,12,13,14,15,16,17,18,19, 20,21,25)]
+
+df_var = df_21[variables]
+
+for (i in 1:length(df_var)){
+  print(names(df_var)[i])
+  f = inf(df_var[[i]], df_21)
+  print(f)
+}
+
+```
+
+#### Columbia Basin
+
+```{r}
+df_21_CB = df_21[df_21$Location == 'Columbia Basin', ]
+inf = function(x ,df = df_21_CB){
+  fit = lmer(x ~ FieldType + (1|Pair), 
+                  data = df)
+return(anova(fit))}
+
+variables = names(df_21_CB)[-c(1,2,3,4,5,10,11,12,13,14,15,16,17,18,19, 20,21,25)]
+variables
+df_var = df_21_CB[variables]
+
+for (i in 1:length(df_var)){
+  print(names(df_var)[i])
+  f = inf(df_var[[i]], df_21_CB)
+  print(f)
+}
+
+```
+
+
+#### Skagit valley
+
+```{r, eval = F}
+df_21_SV = df_21[df_21$Location == 'Skagit Valley', ]
+inf = function(x ,df = df_21_SV){
+  fit = lmer(x ~ FieldType + (1|Pair), 
+                  data = df)
+return(anova(fit))}
+
+variables = names(df_21_SV)[-c(1,2,3,4,5,10,11,12,13,14,15,16,17,18,19, 20,21,25, 28)]
+variables
+df_var = df_21_SV[variables]
+
+for (i in 1:length(df_var)){
+  print(names(df_var)[i])
+  f = inf(df_var[[i]], df_21_SV)
+  print(f)
+}
+
+```
+
+
+## Soil biological properties 
+
+### Pythium 
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('TuberwtAll_soilprints.jpg',width=5,height=3,units='in',res=300)
+sb1= ggplot(data = df_21, aes(x =FieldType, y = Pyth_Avg_Soil, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y=expression(paste("Average ",italic("Pythium")))) +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin'), values = c('orange', 'chartreuse4'))+
+  facet_wrap(~ Location)
+#sb1
+#dev.off()
+```
+
+### Resistant Pythium
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('TuberwtAll_soilprints.jpg',width=5,height=3,units='in',res=300)
+sb2= ggplot(data = df_21, aes(x =FieldType, y = ResPyth_Avg_Soil, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y=expression(paste("Average Res.  ",italic("Pythium")))) +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin'), values = c('orange', 'chartreuse4'))+
+  facet_wrap(~ Location)
+#sb2
+#dev.off()
+```
+
+### Fusarium
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('TuberwtAll_soilprints.jpg',width=5,height=3,units='in',res=300)
+sb3= ggplot(data = df_21, aes(x =FieldType, y = Fus_Avg_Soil, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y=expression(paste("Average ",italic("Fusarium")))) +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin'), values = c('orange', 'chartreuse4'))+
+  facet_wrap(~ Location)
+#sb3
+#dev.off()
+```
+
+### Verticillium
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('TuberwtAll_soilprints.jpg',width=5,height=3,units='in',res=300)
+sb4= ggplot(data = df_21, aes(x =FieldType, y = Vd_Tot_Soil, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y=expression(paste("Total ",italic("V. dahliae")))) +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin'), values = c('orange', 'chartreuse4'))+
+  facet_wrap(~ Location)
+#sb4
+#dev.off()
+```
+
+### Colletotrichum
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('TuberwtAll_soilprints.jpg',width=5,height=3,units='in',res=300)
+sb5= ggplot(data = df_21, aes(x =FieldType, y = BD_Tot_Soil, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y=expression(paste("Total ",italic("C. coccodes")))) +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin'), values = c('orange', 'chartreuse4'))+
+  facet_wrap(~ Location)
+#sb5
+#dev.off()
+```
+
+```{r}
+options(repr.plot.width = 10, repr.plot.height = 6)
+#jpeg('soil_pathogens_21.jpg',width=10,height=7,units='in',res=300)
+plot = ggarrange(sb1,sb2,sb3,sb4,sb5, labels = c("A", "B", "C", "D","E"), ncol = 2, nrow = 3)
+plot
+#dev.off()
+```
+
+
+## Soil phyiscal and chemical properties
+
+### Active Carbon
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('ActiveCarbon_21.jpg',width=5,height=3,units='in',res=300)
+sp1= ggplot(data = df_21, aes(x =FieldType, y = POXC, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y=expression(paste("Active Carbon (mg/kg) "))) +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin'), values = c('orange', 'chartreuse4'))+
+  facet_wrap(~ Location)
+sp1
+#dev.off()
+```
+
+
+# 2022 data visualization and inference
+
+## Microplot Study
+
+```{r}
+yield = read_csv(file = 'C:/Users/theox/Desktop/Projects/SoilFingerPrints/Data/2022/Microplot/microplot_22.csv')
+yield = yield[c('ID', 'location', 'pair', 'FieldType', 'TW_gt20', 'TW_All', 'TC_gt20', 'TC_All')]
+
+yield$location = gsub('columbia Basin', 'Columbia Basin', yield$location)
+
+yield$FieldType = gsub('Virgin field', "Virgin", yield$FieldType)
+yield$FieldType = gsub('Non-virginfield', "Non-virgin", yield$FieldType)
+yield$FieldType = gsub('Non-virgin Field', "Non-virgin", yield$FieldType)
+yield$FieldType = gsub('Non-virgin field', "Non-virgin", yield$FieldType)
+yield$FieldType = gsub('Virgin Field', "Virgin", yield$FieldType)
+
+yield[c("ID", "pair", "FieldType","location")]  = lapply(yield[c("ID", "pair", "FieldType","location")], factor)
+head(yield)
+#unique(yield$FieldType)
+#str(yield)
+#lapply(yield, unique)
+```
+### Tuber weigt more than 20gm
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('Tuberwt_gt20_222_combinedlocations.jpg',width=5,height=3,units='in',res=300)
+a= ggplot(data = yield, aes(x =FieldType, y = TW_gt20, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y="Tuber weight (gm)") +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+facet_wrap(~ location)+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin', 'Native'), 
+                  values = c('tomato', 'orange', 'chartreuse4'))
+#a
+#dev.off()
+```
+
+
+
+### Tuber count more than 20gm
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 20)
+#jpeg('TuberCount_gt20_22_locationwise.jpg',width=5,height=3,units='in',res=300)
+b= ggplot(data = yield, aes(x =FieldType, y = TW_gt20, color = FieldType))+
+    geom_boxplot(width = 0.4)+
+    geom_jitter(alpha=0.8, pch =20,size =5, position=position_jitter(width=0.1))+
+    theme_bw()+
+    labs(x = 'Field Type', y="Number of tubers") +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Non-virgin', 'Virgin', 'Native'), 
+                  values = c('tomato', 'orange', 'chartreuse4'))+facet_grid(~ location)
+#b
+#dev.off()
+```
+
+```{r}
+options(repr.plot.width = 7, repr.plot.height = 6)
+#jpeg('yield 2022_combinedLocations.jpg',width=7,height=6,units='in',res=300)
+combined_plot = ggarrange(a,b, labels = c("A", "B"), ncol = 1, nrow = 2)
+combined_plot
+#dev.off()
+```
+
+
+
+### Tuber weigt more than 20gm
+
+```{r, inclde = F, echo = F}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('Tuberwt_gt20_22_pairwise.jpg',width=5,height=3,units='in',res=300)
+c= ggplot(data = yield, aes(x =pair, y = TW_gt20, color = FieldType))+
+    geom_point(size = 2)+
+    theme_bw()+
+    labs(x = 'Field Type', y="Tuber weight (gm)") +
+    #theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Native', 'Non-virgin', 'Virgin'), values = c('tomato', 'orange', 'chartreuse4'))+facet_wrap(~ location, scales = 'free')
+#c
+#dev.off()
+```
+
+
+### Tuber weigt more than 20gm
+
+```{r, inclde = F, echo = F}
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('Tubercount_gt20_22_pairwise.jpg',width=5,height=3,units='in',res=300)
+d= ggplot(data = yield, aes(x =pair, y = TC_gt20, color = FieldType))+
+    geom_point(size = 2)+
+    theme_bw()+
+    labs(x = 'Field Type', y="Tuber weight (gm)") +
+    #theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Native', 'Non-virgin', 'Virgin'), values = c('tomato', 'orange', 'chartreuse4'))+facet_wrap(~ location, scales = 'free')
+#d
+#dev.off()
+```
+
+
+```{r, inclde = F, echo = F}
+options(repr.plot.width = 7, repr.plot.height = 6)
+#jpeg('yield 2022_pair and location wise.jpg',width=7,height=6,units='in',res=300)
+combined_plot_pairwise = ggarrange(c,d, labels = c("A", "B"), ncol = 1, nrow = 2)
+#combined_plot_pairwise
+#dev.off()
+```
+
+### Inference (linear mixed model)
+Here, locations: columbia basin and skagit valley are considered random effect and field type is considered fixed effect.
+
+**Inference on tuber weight**
+
+```{r}
+
+
+fit_yield = lmer(TC_gt20 ~ FieldType + (1|location), 
+                  data = yield)
+#summary(fit_yield)
+anova(fit_yield)
+
+library(emmeans)
+emmeans(fit_yield, list(pairwise ~ FieldType), adjust = "tukey")
+
+library(lmerTest)
+#difflsmeans(fit_yield, test.effs = "FieldType", df="Kenward-Roger")
+
+#Multiple comparison
+library(multcomp)
+#summary(glht(fit_yield, linfct = mcp(FieldType = "Tukey")), test = adjusted("holm"))
+```
+
+```{r}
+## for columbia basin
+df_22_CB =yield[yield$location == 'Columbia Basin', ]
+anova(lmer(TW_gt20 ~ FieldType + (1|pair), 
+                  data = df_22_CB))
+anova(lm(TW_gt20 ~ FieldType, data = df_22_CB))
+
+#for skagit valley
+df_22_SV = yield[yield$location == 'Skagit Valley', ]
+fit_yield_22_SV = lmer(TW_gt20 ~ FieldType + (1|pair), 
+                  data = df_22_SV)
+
+#summary(fit_yield)
+anova(fit_yield_22_SV)
+
+library(lmerTest)
+#difflsmeans(fit_yield_22_SV, test.effs = "FieldType", df="Kenward-Roger")
+
+#Multiple comparison
+library(multcomp)
+summary(glht(fit_yield_22_SV, linfct = mcp(FieldType = "Tukey")), test = adjusted("holm"))
+
+```
+
+
+
+**Inference on tuber count**
+
+```{r}
+fit_count = lmer(TC_gt20 ~ FieldType + (1|location), 
+                  data = yield)
+#summary(fit_count)
+anova(fit_count)
+#plot(fit_count)
+
+library(emmeans)
+emmeans(fit_count, list(pairwise ~ FieldType), adjust = "tukey")
+```
+
+# 2022 Nematode Abundance 
+
+## Data preparation
+
+```{r}
+df_NC = read_csv('C:/Users/theox/Desktop/Projects/SoilFingerPrints/Data/2022/Nematode_morpho/Nematode_raw_22.csv')
+
+df_NC[c("Sites", "pair", "location", "FieldType")] <- lapply(df_NC[c("Sites", "pair", "location", "FieldType")],
+                                                factor)
+
+df_NC$FieldType = gsub('Field', "", df_NC$FieldType)
+df_NC$FieldType = gsub('field', "", df_NC$FieldType)
+df_NC$FieldType = gsub('Non-virgin ', "Non-virgin", df_NC$FieldType)
+df_NC$FieldType = gsub('Virgin ', "Virgin", df_NC$FieldType)
+df_NC$location = gsub('columbia Basin', 'Columbia Basin', df_NC$location)
+unique(df_NC$FieldType)
+unique(df_NC$location)
+
+df_taxa = df_NC[-c(1,2,3,4)]
+labels = df_NC[c(1,2,3,4)]
+dim(df_NC)
+```
+
+## Visualization
+
+```{r}
+
+# check total abundance in each sample
+rowSums(df_taxa)
+
+# Turn percent cover to relative abundance by dividing each value by sample
+# total abundance
+comm <- decostand(df_taxa, method = "total")
+# check total abundance in each sample
+colSums(comm)
+rowSums(comm)
+
+# select major taxa using threshold 0.3
+
+taxa_sel = comm[colSums(comm)>0.3]
+names(taxa_sel)
+taxa_other = comm[!colSums(comm)>0.3]
+names(taxa_other)
+
+names(taxa_other) = rep('Other',length(taxa_other))
+dim(taxa_other); dim(taxa_sel)
+#taxa_other = comm[!unlist(names(comm)) %in% sel_taxa]
+```
+* Melt to longer format
+
+```{r}
+df_melt = cbind(labels, taxa_sel, taxa_other)
+
+df_melt = melt(as.data.table(df_melt), c("Sites", "location", "pair", "FieldType"))
+dim(df_melt)
+head(df_melt)
+unique(df_melt$variable)
+```
+### plot Nematode Abundance all samples
+
+```{r}
+options(repr.plot.width = 15, repr.plot.height = 6)
+#jpeg('Abundance_samples.jpg',width=12,height=6,units='in',res=300)
+bar = ggplot(df_melt, aes(fill = variable, y=value, x= Sites)) + 
+    geom_bar(position="fill", stat="identity", alpha = 1)+
+  labs(x = 'Samples', y="Relative Abundance", title="Nematode Community 2022")+
+    facet_wrap(~location, scales = 'free', ncol = 1)+theme(legend.title=element_blank())
+bar
+#dev.off()
+```
+
+### Nematode abundance based on field type
+
+```{r}
+options(repr.plot.width = 10, repr.plot.height = 6)
+#jpeg('Abundance_fieldType.jpg',width=10,height=6,units='in',res=300)
+bar = ggplot(df_melt, aes(fill = variable, y=value, x= FieldType)) + 
+    geom_bar(position="fill", stat="identity", alpha = 1)+
+  labs(x="Field type", y="Relative Abundance", title="Nematode Community 2022")+
+  facet_wrap(~location, ncol = 1)+theme(legend.title=element_blank()) 
+bar
+#dev.off()
+```
+
+### Box plot
+
+```{r}
+options(repr.plot.width = 13, repr.plot.height = 7)
+#jpeg('Boxplot_nematode abundance_fieldType.jpg',width=13,height=7,units='in',res=300)
+boxplot = ggplot(df_melt, aes(y=value, x= variable, color = FieldType)) + 
+    geom_boxplot(width = 0.9)+
+    geom_jitter(alpha=0.8, pch =20,size =2, position=position_jitter(width=0.05))+
+  labs(x="Major taxa", y="Relative Abundance", title="Nematode Community 2022")+ theme_bw()+
+  theme(axis.text.x=element_text(angle =80, vjust=0.5, hjust=0.35), legend.title=element_blank())+
+  facet_wrap(~location, ncol = 1, scales = 'free')+
+  scale_color_manual(name = 'Field Type', labels = c('Native', 'Non-Virgin', 'Virgin'), 
+                 values = c('tomato', 'orange', 'chartreuse4'))
+  
+boxplot
+#dev.off()
+```
+
+## Shannon's diversity
+
+```{r}
+
+library(phyloseq)
+library('picante')
+```
+
+```{r}
+#Subsample reads
+count_tab_phy <- otu_table(df_taxa, taxa_are_rows=F)
+ps_rare <- rarefy_even_depth(count_tab_phy, rngseed = 123, replace = FALSE)
+dim(ps_rare)
+log_rare= log2(ps_rare +1)
+shannon = phyloseq::estimate_richness(log_rare, measures = "Shannon")
+#observed = phyloseq::estimate_richness(count_tab_phy, measures = "Observed")
+diversity = cbind(shannon, labels)
+head(diversity)
+```
+
+```{r}
+options(repr.plot.width = 5, repr.plot.height = 20)
+#jpeg('Alpha diveristy.jpg',width=5,height=3,units='in',res=300)
+b= ggplot(data = diversity, aes(x =FieldType, y = Shannon, color = FieldType))+
+    geom_boxplot(outlier.color = NA)+
+    geom_jitter(aes(color = FieldType), height = 0, width = .2)+
+    labs(x = 'Field Type', y="Shannon's diversity index") +
+    theme(legend.position = "none")+
+    theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+scale_color_manual(name = 'Field Type', labels = c('Native', 'Non-Virgin', 'Virgin'), 
+                  values = c('tomato', 'orange', 'chartreuse4'))+facet_wrap(~ location)
+b
+#dev.off()
+```
+
+**Inference**
+
+```{r}
+fit_shannon = lmer(Shannon ~ FieldType + (1|location), data = diversity)
+summary(fit_shannon)
+
+wilcox.observed = pairwise.wilcox.test(diversity$Shannon,
+                     diversity$FieldType,
+                     p.adjust.method = "BH")
+wilcox.observed$p.value
+```
+
+## Beta diversity
+
+### Ordination
+
+
+```{r}
+ord = metaMDS(log_rare, distance = 'bray')
+
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('Beta_biplot.jpg',width=5,height=3,units='in',res=300)
+beta = ggplot(labels, aes(x = ord$points[,1], y = ord$points[,2], 
+                          color = FieldType, shape = location))+
+  geom_point(size = 2)+
+  labs(x = 'NMDS 1', y="NMDS 2") +
+  theme(axis.title.x= element_text(size =10, color ='black'),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+  scale_color_manual(name = 'Field Type', labels = c('Native', 'Non-virgin', 'Virgin'), 
+                  values = c('tomato', 'orange', 'chartreuse4'))+theme_bw()+
+  stat_ellipse(aes(group = FieldType), linetype = 2)
+
+beta
+#dev.off()
+```
+
+
+
+
+
+
+```{r, include = F, echo = F}
+ord = metaMDS(log_rare, distance = 'bray')
+
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('Beta2.jpg',width=5,height=3,units='in',res=300)
+beta = ggplot(labels, aes(x = ord$points[,1], y = ord$points[,2], color = FieldType))+
+  geom_point(size = 2)+
+  labs(x = 'NMDS 1', y="NMDS 2") +
+  theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+  scale_color_manual(name = 'Field Type', labels = c('Native', 'Non-virgin', 'Virgin'), 
+                  values = c('tomato', 'orange', 'chartreuse4'))+
+  facet_wrap(~location)+stat_ellipse(aes(group = FieldType), linetype = 2)
+beta
+#dev.off()
+```
+
+
+
+```{r, include = F, echo = F}
+ord = metaMDS(log_rare, distance = 'bray')
+
+options(repr.plot.width = 5, repr.plot.height = 3)
+#jpeg('Tuberwt_gt20_222_combinedlocations.jpg',width=5,height=3,units='in',res=300)
+beta = ggplot(labels, aes(x = ord$points[,1], y = ord$points[,2], color = FieldType, label= pair))+
+  geom_point(size = 0.1)+
+  geom_text(overlap = F)+
+  labs(x = 'NMDS 1', y="NMDS 2") +
+  theme(axis.title.x= element_blank(),
+        axis.title.y = element_text(size =10, color ='black'),
+        axis.text.x = element_text(size =10, color ='black'),
+        axis.text.y = element_text(size =8, color = 'black'))+
+  theme_bw()+
+  scale_color_manual(name = 'Field Type', labels = c('Native', 'Non-virgin', 'Virgin'), 
+                  values = c('tomato', 'orange', 'chartreuse4'))+
+  facet_wrap(~location)
+beta
+#dev.off()
+```
+
+
+
+### Inference
+
+
+```{r}
+dist = phyloseq::distance(log_rare, method="bray")
+permanova_pairwise<-adonis(dist ~ labels$FieldType, strata = labels$location)
+permanova_pairwise$aov.tab
+```
+
+
+```{r}
+#Generate distance matrix
+clr_dist_matrix <- phyloseq::distance(log_rare, method = "euclidean") 
+
+#ADONIS test
+adon.results<-adonis(clr_dist_matrix ~ labels$FieldType, strata = labels$location)
+adon.results$aov.tab
+
+```
+
+
+
+```{r}
+#Dispersion test and plot
+dispr <- vegan::betadisper(clr_dist_matrix, labels$FieldType)
+plot(dispr, main = "Ordination Centroids and Dispersion Labeled: Aitchison Distance", sub = "")
+```
+
+
+
+
+```{r}
+# and calculating our Euclidean distance matrix
+euc_dist <- dist(log_rare)
+length(euc_dist)
+```
+
+```{r}
+euc_clust <- hclust(euc_dist, method="ward.D2")
+
+#plot(euc_clust) # hclust objects like this can be plotted as is, but i like to change them to dendrograms for two reasons:
+  # 1) it's easier to color the dendrogram plot by groups
+  # 2) if you want you can rotate clusters with the rotate() function of the dendextend package
+
+euc_dend <- as.dendrogram(euc_clust, hang=0.1)
+plot(euc_dend, ylab="VST Euc. dist.")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
