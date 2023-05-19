@@ -1,0 +1,80 @@
+---
+title: "Crop rotation from Crop data layer"
+author: "Sudha"
+date: "2023-05-19"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library("CropScapeR")
+```
+
+
+
+
+```{r}
+
+
+df = read.csv('C:/Users/theox/Desktop/Summer Projects/SoilFingerPrints/Data/SamplingLocations/SamplingLocations.csv',
+         fileEncoding="latin1")
+df = df[c('ID', 'lat', 'long', 'FieldType', 'Location','SamplingYear')]
+head(df)
+df$FieldType = gsub('Field', "", df$FieldType)
+df$FieldType = gsub('field', "", df$FieldType)
+df$FieldType = gsub('Non-virgin ', "Non-virgin", df$FieldType)
+df$FieldType = gsub('Virgin ', "Virgin", df$FieldType)
+unique(df$FieldType)
+
+```
+
+
+
+```{r}
+# define a function that returns the crop data for listed years for a given pin
+crop_data = function(long, lat, years){
+  crop_year = c() #empty list
+  for(i in years){
+    d = GetCDLData(aoi = c(long, lat), year = i, type = 'p', crs = '+init=epsg:4326') #use CropScapeR to extract data
+    crop_year = data.frame(cbind(crop_year,d$category)) # append
+  }
+  names(crop_year) = years # rename the columns
+return(crop_year)} 
+
+# list of dates that we need data from
+years = c('2016','2017','2018','2019','2020','2021','2022') 
+
+#test test
+crop_data(-118.6746, 46.28371, years)
+```
+
+
+
+```{r}
+# list of dates that we need data from
+years = c('2016','2017','2018','2019','2020','2021','2022') 
+data_all = c()
+
+
+# extract data for all fields
+for (j in 1:length(df$long)){
+  
+  data = crop_data(long = df$long[j], lat = df$lat[j], years = years)
+  data_ij = cbind(df[j,], data)
+  data_all = rbind(data_all, data_ij)
+}
+
+dim(data_all)
+head(data_all)
+
+write.csv(data_all, "crop_rotation.csv")
+
+```
+
+
+
+
